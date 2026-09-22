@@ -13,17 +13,25 @@ def get_connection():
         port="5432"
     )
 
-def create_table():
+def create_tables():
     try:
         with get_connection() as conn:
             with conn.cursor() as cursor:
+
                 cursor.execute("""
+                    create table if not exists users(
+                        id serial primary key,
+                        username varchar(50) unique not null,
+                        password varchar(8) not null
+                    );
                     create table if not exists tasks(
                         id serial primary key,
                         title varchar(100) not null,
-                        description text
+                        description text,
+                        user_id int references users(id) on delete cascade
                     );
                 """)
-        conn.close()
-    except Exception as r:
-        print("Ошибка:", r)
+        print("Table created")
+
+    except Exception as e:
+        print("Ошибка:", e)
